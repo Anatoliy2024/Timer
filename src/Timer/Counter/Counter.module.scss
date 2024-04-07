@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  justify-content: center;
+  & > div {
+    div:first-child {
+      text-align: center;
+    }
+    margin-right: 5px;
+  }
+}

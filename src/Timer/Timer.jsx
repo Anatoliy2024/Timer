@@ -112,16 +112,13 @@ export function Timer() {
             </div>
             <button
               onClick={() => {
-                if (
-                  optionTimerTomato.work >= 0 &&
-                  optionTimerTomato.break >= 0
-                ) {
+                if (optionTimerTomato.work > 0 && optionTimerTomato.break > 0) {
                   setOptionTimerTomato((prev) => ({
                     ...prev,
                     save: true,
                   }))
                 } else {
-                  alert('Значения не могут быть отрицательными')
+                  alert('Значения не могут быть отрицательными числами и 0')
                 }
               }}
               className={style.btnSaveOption}

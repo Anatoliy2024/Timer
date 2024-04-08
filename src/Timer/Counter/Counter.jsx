@@ -1,13 +1,26 @@
 import { useEffect, useState, useRef } from 'react'
 import style from './Counter.module.scss'
 
+const music = [
+  '/Timer/audio/1.mp3',
+  '/Timer/audio/2.mp3',
+  '/Timer/audio/3.mp3',
+  '/Timer/audio/4.mp3',
+  '/Timer/audio/5.mp3',
+  '/Timer/audio/6.mp3',
+  '/Timer/audio/7.mp3',
+  '/Timer/audio/8.mp3',
+  '/Timer/audio/9.mp3',
+  '/Timer/audio/10.mp3',
+]
+
 export function Counter({
   timerStart,
   timerReset,
   setTimerReset,
   activeTimer,
   optionTimerTomato,
-  setTimerStart,
+  // setTimerStart,
   // reset,
 }) {
   const [time, setTime] = useState({
@@ -16,7 +29,13 @@ export function Counter({
     minutes: 0,
     seconds: 0,
   })
+  const [randomNumber, setRandomNumber] = useState(
+    Math.floor(Math.random() * 10)
+  )
 
+  const [audio, setAudio] = useState(new Audio(music[randomNumber]))
+
+  audio.volume = 0.1
   let timeMsec = useRef({ start: 0, now: 0 })
   let differentMsec = useRef(0)
 
@@ -31,9 +50,7 @@ export function Counter({
   useEffect(() => {
     if (activeTimer === 'timer') {
     } else if (activeTimer === 'timerTomato') {
-      // reset()
       setTimerReset(true)
-      // setTimerStart(false)
     }
   }, [activeTimer])
 
@@ -56,39 +73,66 @@ export function Counter({
         clearInterval(interval)
       }
     } else if (activeTimer === 'timerTomato') {
-      // setTime((prev) => ({ ...prev, minutes: optionTimerTomato.work }))
       if (timerStart) {
         if (timeTomatoMsec.current.work) {
-          timeTomatoMsec.current.end =
-            Date.now() + timeTomatoMsec.current.totalWork
+          if (timeTomatoMsec.current.end === 0) {
+            timeTomatoMsec.current.end =
+              Date.now() + timeTomatoMsec.current.totalWork
+          } else {
+            timeTomatoMsec.current.end =
+              timeTomatoMsec.current.end +
+              Date.now() -
+              timeTomatoMsec.current.now
+          }
 
           interval = setInterval(() => {
+            timeTomatoMsec.current.now = Date.now()
             getTimeRemainingTomato()
-            console.log(differentMsec.current)
+
             if (differentMsec.current < 1000 && differentMsec.current !== 0) {
               clearInterval(interval)
+
+              audio.play()
+              setRandomNumber(Math.floor(Math.random() * 10))
 
               timeTomatoMsec.current = {
                 ...timeTomatoMsec.current,
                 work: false,
                 break: true,
+                now: 0,
+                end: 0,
               }
-
               differentMsec.current = 0
             }
           }, 1000)
         } else if (timeTomatoMsec.current.break) {
-          timeTomatoMsec.current.end =
-            Date.now() + timeTomatoMsec.current.totalBreak
+          if (timeTomatoMsec.current.end === 0) {
+            timeTomatoMsec.current.end =
+              Date.now() + timeTomatoMsec.current.totalBreak
+          } else {
+            timeTomatoMsec.current.end =
+              timeTomatoMsec.current.end +
+              Date.now() -
+              timeTomatoMsec.current.now
+          }
+
           interval = setInterval(() => {
+            timeTomatoMsec.current.now = Date.now()
+
             getTimeRemainingTomato()
+
             if (differentMsec.current < 1000 && differentMsec.current !== 0) {
               clearInterval(interval)
+
+              audio.play()
+              setRandomNumber(Math.floor(Math.random() * 10))
 
               timeTomatoMsec.current = {
                 ...timeTomatoMsec.current,
                 work: true,
                 break: false,
+                now: 0,
+                end: 0,
               }
               differentMsec.current = 0
             }
@@ -108,15 +152,21 @@ export function Counter({
   ])
 
   useEffect(() => {
+    setAudio(new Audio(music[randomNumber]))
+  }, [randomNumber])
+
+  useEffect(() => {
     if (timerReset) {
       timeMsec.current = { start: 0, now: 0 }
-      // differentMsec.current = 0
       setTime({
         days: 0,
         hours: 0,
         minutes: 0,
         seconds: 0,
       })
+      if (timeTomatoMsec.current.end !== 0 || timeTomatoMsec.current.now !== 0)
+        timeTomatoMsec.current = { ...timeTomatoMsec.current, now: 0, end: 0 }
+
       setTimerReset(false)
     }
   }, [timerReset])

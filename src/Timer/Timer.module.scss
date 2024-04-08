@@ -10,9 +10,13 @@
     rgba(9, 9, 121, 1) 40%,
     rgba(0, 212, 255, 1) 80%
   );
+  box-shadow: 0 0 50px 20px rgb(0, 162, 255);
+
+  // background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+  // box-shadow: 10px 10px 70px rgb(9, 9, 121), -10px -10px 70px rgb(0, 212, 255);
+
   opacity: 0.8;
   border-radius: 25px;
-  box-shadow: 0 0 50px 20px rgb(0, 162, 255);
   color: azure;
   font-size: min(6vw, 35px);
   .container {

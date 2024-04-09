@@ -1,6 +1,6 @@
 import style from './Timer.module.scss'
 import { Counter } from './Counter/Counter'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 export function Timer() {
   const [timerStart, setTimerStart] = useState(false)
   const [timerReset, setTimerReset] = useState(false)
@@ -29,6 +29,32 @@ export function Timer() {
     setActiveTimer('timerTomato')
     reset()
   }
+
+  // запрос для предотвращения ухода в ждущий режим
+  const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  useEffect(() => {
+    if (isMobileDevice) {
+      // Запускаем таймер с интервалом в 30 секунд
+      const preventSleepTimer = setInterval(() => {
+        // Выполняем пустой запрос к серверу
+        fetch('/Timer')
+          .then(() => {
+            console.log(
+              'Запрос к серверу для предотвращения перехода в режим ожидания'
+            )
+          })
+          .catch((err) => {
+            console.error('Ошибка при запросе к серверу:', err)
+          })
+      }, 30000) // 30 секунд
+
+      // Компонент будет размонтирован, поэтому мы должны очистить таймер
+      return () => {
+        clearInterval(preventSleepTimer)
+      }
+    }
+  }, [])
+
   return (
     <div className={style.boxTimer}>
       <div className={style.container}>

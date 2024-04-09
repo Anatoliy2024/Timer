@@ -30,7 +30,7 @@ export function Counter({
     seconds: 0,
   })
   const [randomNumber, setRandomNumber] = useState(
-    Math.floor(Math.random() * 10)
+    Math.floor(Math.random() * music.length)
   )
 
   const [audio, setAudio] = useState(new Audio(music[randomNumber]))
@@ -93,7 +93,7 @@ export function Counter({
               clearInterval(interval)
 
               audio.play()
-              setRandomNumber(Math.floor(Math.random() * 10))
+              setRandomNumber(Math.floor(Math.random() * music.length))
 
               timeTomatoMsec.current = {
                 ...timeTomatoMsec.current,
@@ -125,7 +125,7 @@ export function Counter({
               clearInterval(interval)
 
               audio.play()
-              setRandomNumber(Math.floor(Math.random() * 10))
+              setRandomNumber(Math.floor(Math.random() * music.length))
 
               timeTomatoMsec.current = {
                 ...timeTomatoMsec.current,

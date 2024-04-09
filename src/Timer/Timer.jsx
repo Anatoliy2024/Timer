@@ -1,6 +1,23 @@
 import style from './Timer.module.scss'
 import { Counter } from './Counter/Counter'
 import { useState, useEffect } from 'react'
+// import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Slider from '@mui/material/Slider'
+
+const music = [
+  '/Timer/audio/1.mp3',
+  '/Timer/audio/2.mp3',
+  '/Timer/audio/3.mp3',
+  '/Timer/audio/4.mp3',
+  '/Timer/audio/5.mp3',
+  '/Timer/audio/6.mp3',
+  '/Timer/audio/7.mp3',
+  '/Timer/audio/8.mp3',
+  '/Timer/audio/9.mp3',
+  '/Timer/audio/10.mp3',
+]
+
 export function Timer() {
   const [timerStart, setTimerStart] = useState(false)
   const [timerReset, setTimerReset] = useState(false)
@@ -11,6 +28,24 @@ export function Timer() {
     save: false,
   })
 
+  const [randomNumber, setRandomNumber] = useState(
+    Math.floor(Math.random() * music.length)
+  )
+  const [audio] = useState(new Audio(music[randomNumber]))
+  const playMusic = () => {
+    audio.src = music[randomNumber]
+    audio.play()
+  }
+  useEffect(() => {
+    audio.volume = 0.1
+  }, [])
+  const [value, setValue] = useState(10)
+  const handleChangeValue = (event, newValue) => {
+    setValue(newValue)
+    audio.volume = newValue / 100
+  }
+
+  const [valueActive, setValueActive] = useState(false)
   const reset = () => {
     setTimerReset(true)
     setTimerStart(false)
@@ -29,32 +64,6 @@ export function Timer() {
     setActiveTimer('timerTomato')
     reset()
   }
-
-  // запрос для предотвращения ухода в ждущий режим
-
-  // useEffect(() => {
-  //   const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-  //   if (isMobileDevice) {
-  //     // Запускаем таймер с интервалом в 30 секунд
-  //     const preventSleepTimer = setInterval(() => {
-  //       // Выполняем пустой запрос к серверу
-  //       fetch('/Timer')
-  //         .then(() => {
-  //           console.log(
-  //             'Запрос к серверу для предотвращения перехода в режим ожидания'
-  //           )
-  //         })
-  //         .catch((err) => {
-  //           console.error('Ошибка при запросе к серверу:', err)
-  //         })
-  //     }, 30000) // 30 секунд
-
-  //     // Компонент будет размонтирован, поэтому мы должны очистить таймер
-  //     return () => {
-  //       clearInterval(preventSleepTimer)
-  //     }
-  //   }
-  // }, [])
 
   return (
     <div className={style.boxTimer}>
@@ -78,6 +87,35 @@ export function Timer() {
             src='/Timer/tomato.png'
             alt=''
           />
+          {activeTimer === 'timerTomato' && (
+            <div
+              className={style.value}
+              onMouseEnter={() => {
+                setValueActive(true)
+              }}
+              onMouseLeave={() => {
+                setValueActive(false)
+              }}
+            >
+              <img onClick={() => {}} src='/Timer/value.png' alt='' />
+              {valueActive && (
+                <Stack
+                  className={style.valueSlider}
+                  spacing={2}
+                  direction='row'
+                  alignItems='center'
+                >
+                  <Slider
+                    defaultValue={value}
+                    aria-label='Volume'
+                    value={value}
+                    onChange={handleChangeValue}
+                    color='#f7fffe'
+                  />
+                </Stack>
+              )}
+            </div>
+          )}
         </div>
         {(activeTimer === 'timer' || optionTimerTomato.save === true) && (
           <div className={style.content}>
@@ -88,6 +126,11 @@ export function Timer() {
               timerReset={timerReset}
               setTimerReset={setTimerReset}
               optionTimerTomato={optionTimerTomato}
+              // audio={audio}
+              setRandomNumber={setRandomNumber}
+              music={music}
+              playMusic={playMusic}
+
               // setTimerStart={setTimerStart}
               // reset={reset}
             />
@@ -108,7 +151,7 @@ export function Timer() {
             <div className={style.option}>
               <div>
                 <input
-                  min={0}
+                  min={1}
                   type='number'
                   id='work'
                   value={optionTimerTomato.work}
@@ -123,7 +166,7 @@ export function Timer() {
               </div>
               <div>
                 <input
-                  min={0}
+                  min={1}
                   type='number'
                   id='break'
                   value={optionTimerTomato.break}

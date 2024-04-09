@@ -1,25 +1,16 @@
 import { useEffect, useState, useRef } from 'react'
 import style from './Counter.module.scss'
 
-const music = [
-  '/Timer/audio/1.mp3',
-  '/Timer/audio/2.mp3',
-  '/Timer/audio/3.mp3',
-  '/Timer/audio/4.mp3',
-  '/Timer/audio/5.mp3',
-  '/Timer/audio/6.mp3',
-  '/Timer/audio/7.mp3',
-  '/Timer/audio/8.mp3',
-  '/Timer/audio/9.mp3',
-  '/Timer/audio/10.mp3',
-]
-
 export function Counter({
   timerStart,
   timerReset,
   setTimerReset,
   activeTimer,
   optionTimerTomato,
+  // audio,
+  setRandomNumber,
+  music,
+  playMusic,
   // setTimerStart,
   // reset,
 }) {
@@ -29,13 +20,12 @@ export function Counter({
     minutes: 0,
     seconds: 0,
   })
-  const [randomNumber, setRandomNumber] = useState(
-    Math.floor(Math.random() * music.length)
-  )
+  // const [randomNumber, setRandomNumber] = useState(
+  //   Math.floor(Math.random() * music.length)
+  // )
 
-  const [audio, setAudio] = useState(new Audio(music[randomNumber]))
+  // const [audio, setAudio] = useState(new Audio(music[randomNumber]))
 
-  audio.volume = 0.1
   let timeMsec = useRef({ start: 0, now: 0 })
   let differentMsec = useRef(0)
 
@@ -53,7 +43,9 @@ export function Counter({
       setTimerReset(true)
     }
   }, [activeTimer])
-
+  // useEffect(() => {
+  //   audio.volume = value.value
+  // }, [value])
   useEffect(() => {
     let interval
     if (activeTimer === 'timer') {
@@ -75,6 +67,7 @@ export function Counter({
     } else if (activeTimer === 'timerTomato') {
       if (timerStart) {
         if (timeTomatoMsec.current.work) {
+          setTime((prev) => ({ ...prev, minutes: optionTimerTomato.work }))
           if (timeTomatoMsec.current.end === 0) {
             timeTomatoMsec.current.end =
               Date.now() + timeTomatoMsec.current.totalWork
@@ -90,22 +83,25 @@ export function Counter({
             getTimeRemainingTomato()
 
             if (differentMsec.current < 1000 && differentMsec.current !== 0) {
-              clearInterval(interval)
+              resetTomato(interval)
 
-              audio.play()
-              setRandomNumber(Math.floor(Math.random() * music.length))
+              // clearInterval(interval)
 
-              timeTomatoMsec.current = {
-                ...timeTomatoMsec.current,
-                work: false,
-                break: true,
-                now: 0,
-                end: 0,
-              }
-              differentMsec.current = 0
+              // audio.play()
+              // setRandomNumber(Math.floor(Math.random() * music.length))
+
+              // timeTomatoMsec.current = {
+              //   ...timeTomatoMsec.current,
+              //   work: false,
+              //   break: true,
+              //   now: 0,
+              //   end: 0,
+              // }
+              // differentMsec.current = 0
             }
           }, 1000)
         } else if (timeTomatoMsec.current.break) {
+          setTime((prev) => ({ ...prev, minutes: optionTimerTomato.break }))
           if (timeTomatoMsec.current.end === 0) {
             timeTomatoMsec.current.end =
               Date.now() + timeTomatoMsec.current.totalBreak
@@ -122,19 +118,20 @@ export function Counter({
             getTimeRemainingTomato()
 
             if (differentMsec.current < 1000 && differentMsec.current !== 0) {
-              clearInterval(interval)
+              resetTomato(interval)
+              // clearInterval(interval)
 
-              audio.play()
-              setRandomNumber(Math.floor(Math.random() * music.length))
+              // audio.play()
+              // setRandomNumber(Math.floor(Math.random() * music.length))
 
-              timeTomatoMsec.current = {
-                ...timeTomatoMsec.current,
-                work: true,
-                break: false,
-                now: 0,
-                end: 0,
-              }
-              differentMsec.current = 0
+              // timeTomatoMsec.current = {
+              //   ...timeTomatoMsec.current,
+              //   work: true,
+              //   break: false,
+              //   now: 0,
+              //   end: 0,
+              // }
+              // differentMsec.current = 0
             }
           }, 1000)
         }
@@ -150,22 +147,45 @@ export function Counter({
     timeTomatoMsec.current.work,
     timeTomatoMsec.current.break,
   ])
+  const resetTomato = (interval) => {
+    clearInterval(interval)
+    playMusic()
+    // audio.play()
+    setRandomNumber(Math.floor(Math.random() * music.length))
 
-  useEffect(() => {
-    setAudio(new Audio(music[randomNumber]))
-  }, [randomNumber])
+    timeTomatoMsec.current = {
+      ...timeTomatoMsec.current,
+      work: !timeTomatoMsec.current.work,
+      break: !timeTomatoMsec.current.break,
+      now: 0,
+      end: 0,
+    }
+    differentMsec.current = 0
+  }
+
+  // useEffect(() => {
+  //   setAudio(new Audio(music[randomNumber]))
+  // }, [randomNumber])
 
   useEffect(() => {
     if (timerReset) {
-      timeMsec.current = { start: 0, now: 0 }
       setTime({
         days: 0,
         hours: 0,
         minutes: 0,
         seconds: 0,
       })
-      if (timeTomatoMsec.current.end !== 0 || timeTomatoMsec.current.now !== 0)
+      if (timeMsec.current.start !== 0 || timeMsec.current.now !== 0) {
+        timeMsec.current = { start: 0, now: 0 }
+      } else if (
+        timeTomatoMsec.current.end !== 0 ||
+        timeTomatoMsec.current.now !== 0
+      ) {
         timeTomatoMsec.current = { ...timeTomatoMsec.current, now: 0, end: 0 }
+      }
+
+      // if (timeTomatoMsec.current.end !== 0 || timeTomatoMsec.current.now !== 0)
+      //   timeTomatoMsec.current = { ...timeTomatoMsec.current, now: 0, end: 0 }
 
       setTimerReset(false)
     }

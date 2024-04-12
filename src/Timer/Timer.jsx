@@ -120,6 +120,7 @@ export function Timer() {
         {(activeTimer === 'timer' || optionTimerTomato.save === true) && (
           <div className={style.content}>
             <h1>Timer</h1>
+
             <Counter
               timerStart={timerStart}
               activeTimer={activeTimer}
@@ -136,7 +137,13 @@ export function Timer() {
             />
             <div className={style.buttons}>
               <button
-                onClick={() => setTimerStart((current) => !current)}
+                onClick={() => {
+                  setTimerStart((current) => !current)
+                  if (activeTimer === 'timerTomato') {
+                    audio.play()
+                    audio.pause()
+                  }
+                }}
                 className={style.bnStart}
               >
                 {timerStart ? 'Pause' : 'Start'}

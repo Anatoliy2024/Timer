@@ -28,9 +28,8 @@ export function Timer() {
     save: false,
   })
 
-  const [randomNumber, setRandomNumber] = useState(
-    Math.floor(Math.random() * music.length)
-  )
+  const [randomNumber, setRandomNumber] = useState(0)
+  const [firstClickStart, setFirstClickStart] = useState(true)
   const [audio] = useState(new Audio(music[randomNumber]))
   const playMusic = () => {
     audio.src = music[randomNumber]
@@ -131,6 +130,7 @@ export function Timer() {
               setRandomNumber={setRandomNumber}
               music={music}
               playMusic={playMusic}
+              setFirstClickStart={setFirstClickStart}
 
               // setTimerStart={setTimerStart}
               // reset={reset}
@@ -139,9 +139,13 @@ export function Timer() {
               <button
                 onClick={() => {
                   setTimerStart((current) => !current)
-                  if (activeTimer === 'timerTomato') {
+                  if (
+                    activeTimer === 'timerTomato' &&
+                    firstClickStart === true
+                  ) {
                     audio.play()
                     audio.pause()
+                    setFirstClickStart(false)
                   }
                 }}
                 className={style.bnStart}

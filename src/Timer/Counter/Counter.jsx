@@ -7,6 +7,7 @@ export function Counter({
   setTimerReset,
   activeTimer,
   optionTimerTomato,
+  setFirstClickStart,
   // audio,
   setRandomNumber,
   music,
@@ -67,7 +68,9 @@ export function Counter({
     } else if (activeTimer === 'timerTomato') {
       if (timerStart) {
         if (timeTomatoMsec.current.work) {
-          setTime((prev) => ({ ...prev, minutes: optionTimerTomato.work }))
+          if (time.seconds === 0) {
+            setTime((prev) => ({ ...prev, minutes: optionTimerTomato.work }))
+          }
           if (timeTomatoMsec.current.end === 0) {
             timeTomatoMsec.current.end =
               Date.now() + timeTomatoMsec.current.totalWork
@@ -101,7 +104,10 @@ export function Counter({
             }
           }, 1000)
         } else if (timeTomatoMsec.current.break) {
-          setTime((prev) => ({ ...prev, minutes: optionTimerTomato.break }))
+          if (time.seconds === 0) {
+            setTime((prev) => ({ ...prev, minutes: optionTimerTomato.break }))
+          }
+
           if (timeTomatoMsec.current.end === 0) {
             timeTomatoMsec.current.end =
               Date.now() + timeTomatoMsec.current.totalBreak
@@ -182,6 +188,7 @@ export function Counter({
         timeTomatoMsec.current.now !== 0
       ) {
         timeTomatoMsec.current = { ...timeTomatoMsec.current, now: 0, end: 0 }
+        setFirstClickStart(true)
       }
 
       // if (timeTomatoMsec.current.end !== 0 || timeTomatoMsec.current.now !== 0)
